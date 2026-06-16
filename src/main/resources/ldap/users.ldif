@@ -1,0 +1,46 @@
+dn: dc=minimarket,dc=cl
+objectClass: top
+objectClass: domain
+dc: minimarket
+
+dn: ou=people,dc=minimarket,dc=cl
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: uid=ldap.empleado,ou=people,dc=minimarket,dc=cl
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Empleado LDAP
+sn: Empleado
+uid: ldap.empleado
+userPassword: LdapEmpleado123!
+
+dn: uid=ldap.gerente,ou=people,dc=minimarket,dc=cl
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Gerente LDAP
+sn: Gerente
+uid: ldap.gerente
+userPassword: LdapGerente123!
+
+dn: ou=groups,dc=minimarket,dc=cl
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=EMPLEADO,ou=groups,dc=minimarket,dc=cl
+objectClass: top
+objectClass: groupOfNames
+cn: EMPLEADO
+member: uid=ldap.empleado,ou=people,dc=minimarket,dc=cl
+
+dn: cn=GERENTE,ou=groups,dc=minimarket,dc=cl
+objectClass: top
+objectClass: groupOfNames
+cn: GERENTE
+member: uid=ldap.gerente,ou=people,dc=minimarket,dc=cl
