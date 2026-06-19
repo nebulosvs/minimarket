@@ -62,4 +62,13 @@ public class Inventario {
     public void setFechaMovimiento(Date fechaMovimiento) {
         this.fechaMovimiento = fechaMovimiento;
     }
+
+    public void validarInformacionMovimiento() {
+        if (cantidad == null || cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad es obligatoria y debe ser mayor a cero");
+        }
+        if (tipoMovimiento == null || tipoMovimiento.isBlank()) {
+            throw new IllegalArgumentException("El tipo de movimiento es obligatorio");
+        }
+    }
 }
