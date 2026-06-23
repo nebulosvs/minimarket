@@ -1,5 +1,7 @@
 # Maven
 target/
 
-# Spring Boot (generado automáticamente)
+# Spring Boot
 HELP.md
+
+./idea
