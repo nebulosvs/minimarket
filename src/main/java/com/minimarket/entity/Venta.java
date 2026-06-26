@@ -63,4 +63,36 @@ public class Venta {
     public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
     }
+
+    public double calcularTotalDesdeDetalles() {
+        if (detalles == null || detalles.isEmpty()) {
+            return 0.0;
+        }
+        return detalles.stream()
+                .mapToDouble(detalle -> detalle.getPrecio() * detalle.getCantidad())
+                .sum();
+    }
+
+    public boolean detallesReflejanProductosVendidos() {
+        if (detalles == null || detalles.isEmpty()) {
+            return false;
+        }
+        return detalles.stream().allMatch(detalle ->
+                detalle.getProducto() != null
+                        && detalle.getProducto().getId() != null
+                        && detalle.getCantidad() != null
+                        && detalle.getCantidad() > 0
+                        && detalle.getPrecio() != null
+                        && detalle.getPrecio() > 0
+        );
+    }
+
+    public static boolean puedeSerRegistradaPor(Usuario usuario) {
+        if (usuario == null || usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
+            return false;
+        }
+        return usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .anyMatch("EMPLEADO"::equals);
+    }
 }

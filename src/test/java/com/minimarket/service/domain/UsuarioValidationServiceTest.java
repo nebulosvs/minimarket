@@ -50,8 +50,8 @@ class UsuarioValidationServiceTest {
     }
 
     @Test
-    void puedeRegistrarVentas_conRolCliente_retornaTrue() {
-        assertTrue(usuarioValidationService.puedeRegistrarVentas(usuarioCliente));
+    void puedeRegistrarVentas_conRolCliente_retornaFalse() {
+        assertFalse(usuarioValidationService.puedeRegistrarVentas(usuarioCliente));
     }
 
     @Test

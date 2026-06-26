@@ -42,7 +42,7 @@ class RoleBasedAccessTests {
         empleadoToken = loginAndGetToken(mockMvc, objectMapper, "empleado", "Empleado123!");
         gerenteToken = loginAndGetToken(mockMvc, objectMapper, "gerente", "Gerente123!");
         categoriaId = SecurityTestSupport.createCategoria(mockMvc, objectMapper, empleadoToken, "Cat-" + suffix);
-        productoId = SecurityTestSupport.createProducto(mockMvc, objectMapper, empleadoToken, categoriaId, "Prod-" + suffix);
+        productoId = SecurityTestSupport.createProducto(mockMvc, objectMapper, gerenteToken, categoriaId, "Prod-" + suffix);
     }
 
     @Test
@@ -129,13 +129,26 @@ class RoleBasedAccessTests {
     }
 
     @Test
-    void shouldAllowEmpleadoToCreateProducto() throws Exception {
+    void shouldDenyEmpleadoFromCreatingProducto() throws Exception {
         String body = """
                 {"nombre":"Aceite","precio":2990.0,"stock":10,"categoria":{"id":%d}}
                 """.formatted(categoriaId);
 
         mockMvc.perform(post("/api/productos")
                         .header("Authorization", bearer(empleadoToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldAllowGerenteToCreateProducto() throws Exception {
+        String body = """
+                {"nombre":"Aceite","precio":2990.0,"stock":10,"categoria":{"id":%d}}
+                """.formatted(categoriaId);
+
+        mockMvc.perform(post("/api/productos")
+                        .header("Authorization", bearer(gerenteToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk());
@@ -151,7 +164,7 @@ class RoleBasedAccessTests {
     @Test
     void shouldAllowGerenteToDeleteProducto() throws Exception {
         long extraProductoId = SecurityTestSupport.createProducto(
-                mockMvc, objectMapper, empleadoToken, categoriaId, "Producto temporal");
+                mockMvc, objectMapper, gerenteToken, categoriaId, "Producto temporal");
 
         mockMvc.perform(delete("/api/productos/" + extraProductoId)
                         .header("Authorization", bearer(gerenteToken)))

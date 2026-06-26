@@ -137,9 +137,19 @@ class VentaBusinessServiceTest {
         verify(ventaRepository, never()).save(any());
     }
 
+    @Test
+    void registrarVenta_usuarioCliente_lanzaExcepcion() {
+        Venta venta = ventaValida(List.of(detalle(leche, 1, 1990.0)));
+        venta.setUsuario(TestDataFactory.usuarioCompleto("cliente", "CLIENTE"));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(venta.getUsuario()));
+
+        assertThrows(IllegalArgumentException.class, () -> ventaBusinessService.registrarVenta(venta));
+        verify(ventaRepository, never()).save(any());
+    }
+
     private Venta ventaValida(List<DetalleVenta> detalles) {
         Venta venta = new Venta();
-        venta.setUsuario(TestDataFactory.usuarioCompleto("cliente", "CLIENTE"));
+        venta.setUsuario(TestDataFactory.usuarioCompleto("empleado", "EMPLEADO"));
         venta.setFecha(new Date());
         venta.setDetalles(detalles);
         return venta;

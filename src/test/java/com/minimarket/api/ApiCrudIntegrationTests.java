@@ -49,7 +49,7 @@ class ApiCrudIntegrationTests {
         categoriaNombre = "Lac-" + suffix;
         productoNombre = "Leche-" + suffix;
         categoriaId = SecurityTestSupport.createCategoria(mockMvc, objectMapper, empleadoToken, categoriaNombre);
-        productoId = SecurityTestSupport.createProducto(mockMvc, objectMapper, empleadoToken, categoriaId, productoNombre);
+        productoId = SecurityTestSupport.createProducto(mockMvc, objectMapper, gerenteToken, categoriaId, productoNombre);
     }
 
     @Test
@@ -75,12 +75,27 @@ class ApiCrudIntegrationTests {
                 """.formatted(nombre, categoriaId);
 
         mockMvc.perform(post("/api/productos")
-                        .header("Authorization", bearer(empleadoToken))
+                        .header("Authorization", bearer(gerenteToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value(nombre))
                 .andExpect(jsonPath("$.categoria.id").value(categoriaId));
+    }
+
+    @Test
+    void shouldDenyEmpleadoFromCreatingProducto() throws Exception {
+        String suffix = UUID.randomUUID().toString().substring(0, 8);
+        String nombre = "Prod-deny-" + suffix;
+        String body = """
+                {"nombre":"%s","precio":1990.0,"stock":25,"categoria":{"id":%d}}
+                """.formatted(nombre, categoriaId);
+
+        mockMvc.perform(post("/api/productos")
+                        .header("Authorization", bearer(empleadoToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -119,7 +134,30 @@ class ApiCrudIntegrationTests {
     }
 
     @Test
-    void shouldCreateVentaAsCliente() throws Exception {
+    void shouldCreateVentaAsEmpleado() throws Exception {
+        long empleadoId = SecurityTestSupport.findUsuarioIdByUsername(
+                mockMvc, objectMapper, gerenteToken, "empleado");
+        long timestamp = new Date().getTime();
+        String body = """
+                {
+                  "usuario":{"id":%d},
+                  "fecha":%d,
+                  "detalles":[
+                    {"producto":{"id":%d},"cantidad":2,"precio":1990.0}
+                  ]
+                }
+                """.formatted(empleadoId, timestamp, productoId);
+
+        mockMvc.perform(post("/api/ventas")
+                        .header("Authorization", bearer(empleadoToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(3980.0));
+    }
+
+    @Test
+    void shouldDenyClienteFromCreatingVenta() throws Exception {
         String clienteToken = loginAndGetToken(mockMvc, objectMapper, "cliente", "Cliente123!");
         long clienteId = SecurityTestSupport.findUsuarioIdByUsername(
                 mockMvc, objectMapper, gerenteToken, "cliente");
@@ -138,7 +176,6 @@ class ApiCrudIntegrationTests {
                         .header("Authorization", bearer(clienteToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(3980.0));
+                .andExpect(status().isForbidden());
     }
 }

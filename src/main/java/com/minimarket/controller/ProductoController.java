@@ -27,13 +27,13 @@ public class ProductoController {
         return (producto != null) ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
     }
 
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'GERENTE')")
+    @PreAuthorize("hasRole('GERENTE')")
     @PostMapping
     public Producto guardarProducto(@RequestBody Producto producto) {
         return productoService.save(producto);
     }
 
-    @PreAuthorize("hasAnyRole('EMPLEADO', 'GERENTE')")
+    @PreAuthorize("hasRole('GERENTE')")
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
         Producto productoExistente = productoService.findById(id);

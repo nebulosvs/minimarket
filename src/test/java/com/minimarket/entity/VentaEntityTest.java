@@ -7,7 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VentaEntityTest {
 
@@ -53,6 +55,90 @@ class VentaEntityTest {
 
         assertEquals(7L, venta.getUsuario().getId());
         assertEquals("cliente@minimarket.cl", venta.getUsuario().getEmail());
+    }
+
+    @Test
+    void calcularTotalDesdeDetalles_sumaCorrectamente() {
+        Venta venta = new Venta();
+        venta.setDetalles(List.of(
+                detalle(TestDataFactory.producto(1L, "Aceite", 3000.0, 4), 2, 3000.0),
+                detalle(TestDataFactory.producto(2L, "Azucar", 1500.0, 8), 1, 1500.0)
+        ));
+
+        assertEquals(7500.0, venta.calcularTotalDesdeDetalles());
+    }
+
+    @Test
+    void detallesReflejanProductosVendidos_conDetallesValidos_retornaTrue() {
+        Venta venta = new Venta();
+        venta.setDetalles(List.of(
+                detalle(TestDataFactory.producto(1L, "Leche", 1990.0, 10), 3, 1990.0)
+        ));
+
+        assertTrue(venta.detallesReflejanProductosVendidos());
+    }
+
+    @Test
+    void detallesReflejanProductosVendidos_sinProducto_retornaFalse() {
+        DetalleVenta detalle = new DetalleVenta();
+        detalle.setCantidad(2);
+        detalle.setPrecio(1000.0);
+
+        Venta venta = new Venta();
+        venta.setDetalles(List.of(detalle));
+
+        assertFalse(venta.detallesReflejanProductosVendidos());
+    }
+
+    @Test
+    void detallesReflejanProductosVendidos_listaVacia_retornaFalse() {
+        Venta venta = new Venta();
+        venta.setDetalles(List.of());
+
+        assertFalse(venta.detallesReflejanProductosVendidos());
+    }
+
+    @Test
+    void puedeSerRegistradaPor_empleado_retornaTrue() {
+        Usuario empleado = TestDataFactory.usuarioCompleto("empleado", "EMPLEADO");
+
+        assertTrue(Venta.puedeSerRegistradaPor(empleado));
+    }
+
+    @Test
+    void puedeSerRegistradaPor_cliente_retornaFalse() {
+        Usuario cliente = TestDataFactory.usuarioCompleto("cliente", "CLIENTE");
+
+        assertFalse(Venta.puedeSerRegistradaPor(cliente));
+    }
+
+    @Test
+    void puedeSerRegistradaPor_gerente_retornaFalse() {
+        Usuario gerente = TestDataFactory.usuarioCompleto("gerente", "GERENTE");
+
+        assertFalse(Venta.puedeSerRegistradaPor(gerente));
+    }
+
+    @Test
+    void ventaConDetalles_reflejaProductosYCantidadesVendidas() {
+        Producto arroz = TestDataFactory.producto(1L, "Arroz", 2500.0, 20);
+        Producto aceite = TestDataFactory.producto(2L, "Aceite", 3500.0, 15);
+        Usuario cajero = TestDataFactory.usuarioCompleto("empleado", "EMPLEADO");
+
+        DetalleVenta detalleArroz = detalle(arroz, 2, 2500.0);
+        DetalleVenta detalleAceite = detalle(aceite, 1, 3500.0);
+
+        Venta venta = new Venta();
+        venta.setUsuario(cajero);
+        venta.setFecha(new Date());
+        venta.setDetalles(List.of(detalleArroz, detalleAceite));
+
+        assertTrue(Venta.puedeSerRegistradaPor(cajero));
+        assertTrue(venta.detallesReflejanProductosVendidos());
+        assertEquals(8500.0, venta.calcularTotalDesdeDetalles());
+        assertEquals("Arroz", venta.getDetalles().get(0).getProducto().getNombre());
+        assertEquals(2, venta.getDetalles().get(0).getCantidad());
+        assertEquals("Aceite", venta.getDetalles().get(1).getProducto().getNombre());
     }
 
     private DetalleVenta detalle(Producto producto, int cantidad, double precio) {

@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InventarioEntityTest {
 
@@ -70,5 +71,59 @@ class InventarioEntityTest {
         assertSame(producto, inventario.getProducto());
         assertEquals(5L, inventario.getProducto().getId());
         assertEquals("Azucar", inventario.getProducto().getNombre());
+    }
+
+    @Test
+    void registrarMovimiento_entrada_registraCorrectamente() {
+        Inventario inventario = new Inventario();
+
+        inventario.registrarMovimiento("Entrada", 15);
+
+        assertEquals("Entrada", inventario.getTipoMovimiento());
+        assertEquals(15, inventario.getCantidad());
+    }
+
+    @Test
+    void registrarMovimiento_salida_registraCorrectamente() {
+        Inventario inventario = new Inventario();
+
+        inventario.registrarMovimiento("Salida", 8);
+
+        assertEquals("Salida", inventario.getTipoMovimiento());
+        assertEquals(8, inventario.getCantidad());
+    }
+
+    @Test
+    void registrarMovimiento_tipoInvalido_lanzaExcepcion() {
+        Inventario inventario = new Inventario();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> inventario.registrarMovimiento("Traslado", 5));
+    }
+
+    @Test
+    void usuarioTienePermiso_empleado_retornaTrue() {
+        Usuario empleado = TestDataFactory.usuarioCompleto("empleado", "EMPLEADO");
+
+        assertTrue(Inventario.usuarioTienePermiso(empleado));
+    }
+
+    @Test
+    void usuarioTienePermiso_gerente_retornaTrue() {
+        Usuario gerente = TestDataFactory.usuarioCompleto("gerente", "GERENTE");
+
+        assertTrue(Inventario.usuarioTienePermiso(gerente));
+    }
+
+    @Test
+    void usuarioTienePermiso_cliente_retornaFalse() {
+        Usuario cliente = TestDataFactory.usuarioCompleto("cliente", "CLIENTE");
+
+        assertFalse(Inventario.usuarioTienePermiso(cliente));
+    }
+
+    @Test
+    void usuarioTienePermiso_usuarioNulo_retornaFalse() {
+        assertFalse(Inventario.usuarioTienePermiso(null));
     }
 }

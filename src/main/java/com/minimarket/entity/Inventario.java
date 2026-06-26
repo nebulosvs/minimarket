@@ -1,10 +1,14 @@
 package com.minimarket.entity;
 
 import jakarta.persistence.*;
+
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 public class Inventario {
+
+    public static final Set<String> TIPOS_MOVIMIENTO_VALIDOS = Set.of("Entrada", "Salida");
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -70,5 +74,23 @@ public class Inventario {
         if (tipoMovimiento == null || tipoMovimiento.isBlank()) {
             throw new IllegalArgumentException("El tipo de movimiento es obligatorio");
         }
+        if (!TIPOS_MOVIMIENTO_VALIDOS.contains(tipoMovimiento)) {
+            throw new IllegalArgumentException("Tipo de movimiento inválido: " + tipoMovimiento);
+        }
+    }
+
+    public void registrarMovimiento(String tipo, int cantidadMovimiento) {
+        this.tipoMovimiento = tipo;
+        this.cantidad = cantidadMovimiento;
+        validarInformacionMovimiento();
+    }
+
+    public static boolean usuarioTienePermiso(Usuario usuario) {
+        if (usuario == null || usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
+            return false;
+        }
+        return usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .anyMatch(rol -> "EMPLEADO".equals(rol) || "GERENTE".equals(rol));
     }
 }
