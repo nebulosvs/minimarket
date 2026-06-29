@@ -1,39 +1,168 @@
 # MiniMarket Plus API
 
-API REST en Spring Boot para la gestión de un minimarket: productos, categorías, carrito, inventario, ventas y seguridad con JWT, LDAP embebido y soporte opcional OAuth2.
+## Descripción
 
-## Requisitos
+**MiniMarket Plus API** es una aplicación backend desarrollada con **Spring Boot** que implementa una API REST para la gestión de un minimarket.
 
-- **Java 17** o superior (`java -version`)
-- Conexión a internet en la **primera ejecución** (Maven Wrapper descarga dependencias automáticamente)
-- No se requiere Maven instalado ni base de datos externa (usa H2 en memoria)
+El proyecto permite administrar:
 
-## Ejecución
+* Productos
+* Categorías
+* Inventario
+* Carrito de compras
+* Ventas
+* Usuarios y autenticación
 
-### Windows
+Se implementaron mecanismos de seguridad mediante **Spring Security**, autenticación con **JWT**, soporte para **LDAP embebido** y configuración opcional para **OAuth2 Resource Server**. Además, se desarrollaron pruebas unitarias y de integración utilizando **JUnit 5**, **Mockito** y **JaCoCo** para validar el correcto funcionamiento del sistema.
 
+---
+
+# Tecnologías utilizadas
+
+* Java 17
+* Spring Boot 3
+* Spring Security
+* Spring Data JPA
+* H2 Database
+* Maven Wrapper
+* JUnit 5
+* Mockito
+* JaCoCo
+* JWT
+* LDAP Embedded
+* OAuth2 Resource Server (configuración disponible)
+
+---
+
+# Requisitos
+
+Antes de ejecutar el proyecto asegúrate de contar con:
+
+* Java 17 o superior
+* Conexión a Internet en la primera ejecución (para descargar dependencias de Maven)
+
+No es necesario instalar Maven ni configurar una base de datos externa, ya que el proyecto utiliza **Maven Wrapper** y una base de datos **H2 en memoria**.
+
+---
+
+# Ejecución del proyecto
+
+## Windows
+
+```bash
 .\mvnw.cmd spring-boot:run
+```
 
-La aplicación inicia en **http://localhost:8081** (puerto configurado en `application.properties`, no el 8080 por defecto por que lo tenia ocupado en el dispositivo donde se desarrolló).
+La aplicación quedará disponible en:
 
-## Ejecutar pruebas
+```
+http://localhost:8081
+```
 
-.\mvnw.cmd test
+> El puerto utilizado es **8081**, ya que durante el desarrollo el puerto 8080 se encontraba ocupado.
 
+---
 
-Para generar reporte de cobertura JaCoCo:
+# Ejecución de pruebas
 
-.\mvnw.cmd verify
+Para ejecutar todas las pruebas:
 
-El reporte queda en `target/site/jacoco/index.html`.
+```bash
+.\mvnw test
+```
 
-## Estructura del proyecto
+Para ejecutar las pruebas junto con el análisis de cobertura:
 
-src/main/java/com/minimarket/
-├── controller/     # Endpoints REST
-├── entity/         # Entidades JPA (Carrito, Inventario, Producto, etc.)
-├── repository/     # Acceso a datos
-├── service/        # Lógica de negocio
-└── security/       # JWT, LDAP, OAuth2, auditoría
+```bash
+.\mvnw verify
+```
 
-src/test/java/      # Pruebas unitarias e integración (JUnit 5 + Mockito)
+El reporte HTML generado por JaCoCo se encuentra en:
+
+```
+target/site/jacoco/index.html
+```
+
+---
+
+# Estructura del proyecto
+
+```
+src
+├── main
+│   ├── java
+│   │   └── com.minimarket
+│   │       ├── controller
+│   │       ├── dto
+│   │       ├── entity
+│   │       ├── exception
+│   │       ├── repository
+│   │       ├── security
+│   │       ├── service
+│   │       └── config
+│   └── resources
+│
+└── test
+    └── java
+        └── com.minimarket
+```
+
+---
+
+# Seguridad implementada
+
+El sistema incorpora distintos mecanismos de seguridad:
+
+* Autenticación mediante JWT.
+* Control de acceso basado en roles (RBAC).
+* LDAP embebido para autenticación durante el desarrollo.
+* Configuración para OAuth2 Resource Server.
+* Protección de endpoints mediante Spring Security.
+* Auditoría básica de eventos relacionados con autenticación.
+
+Los roles utilizados son:
+
+| Rol      | Permisos principales                       |
+| -------- | ------------------------------------------ |
+| GERENTE  | Administración completa del sistema        |
+| EMPLEADO | Gestión de ventas e inventario             |
+| CLIENTE  | Operaciones limitadas de consulta y compra |
+
+---
+
+# Pruebas implementadas
+
+El proyecto incluye pruebas para validar:
+
+* Entidades del dominio.
+* Servicios.
+* Controladores.
+* Autenticación.
+* Autorización por roles.
+* Integración con Spring Security.
+
+Las pruebas fueron desarrolladas utilizando:
+
+* JUnit 5
+* Mockito
+* Spring Boot Test
+* MockMvc
+* JaCoCo
+
+---
+
+# Cobertura de pruebas
+
+La cobertura del proyecto fue analizada mediante **JaCoCo**, verificando el cumplimiento de los principales escenarios funcionales y de seguridad definidos para la actividad.
+
+---
+
+# Autores
+
+Proyecto desarrollado para la asignatura **Desarrollo Backend II (PBY2202)**.
+
+Integrantes del equipo:
+
+* Sebastián Tapia
+* Sofía Medina
+* Ángel Cáceres
